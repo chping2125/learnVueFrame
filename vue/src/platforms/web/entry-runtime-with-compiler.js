@@ -1,9 +1,5 @@
 /* @flow */
 
-// 1. 缓存 mount 并 覆盖
-// 2. 挂载 compile：将模板 template 编译为render函数
-// Vue.compile
-
 import config from 'core/config'
 import { warn, cached } from 'core/util/index'
 import { mark, measure } from 'core/util/perf'
@@ -35,6 +31,7 @@ Vue.prototype.$mount = function (
 
   const options = this.$options
   // resolve template/el and convert to render function
+  // 如果没有 render ,则利用 template/el 创建一个 render ,并挂载到 options 上
   if (!options.render) {
     let template = options.template
     if (template) {
@@ -101,3 +98,12 @@ function getOuterHTML (el: Element): string {
 Vue.compile = compileToFunctions
 
 export default Vue
+
+
+// 1. 缓存 mount 并 覆盖（原因是将根据有无 render 函数来生产 render, 并保存到 options）
+//  options.template
+//  options.render
+//  options.staticRenderFns
+//
+// 2. 挂载 compile：将模板 template 编译为render函数
+// Vue.compile

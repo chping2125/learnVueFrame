@@ -94,9 +94,17 @@ export function initMixin (Vue: Class<Component>) {
       measure(`${vm._name} init`, startTag, endTag)
     }
 
-    // 如果有 el 参数，则挂在实例到 el 上
+    // 如果有 el 参数，则挂载 Vue 实例到 el 上
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
+      // 挂载的核心代码 ./lifecycle.js mountComponent() 函数
+      // vm.$el
+      // callHook(vm, 'beforeMount')
+      // vm._watcher  监听虚拟 DOM 的 Watcher 实例
+      // vm._vnode
+      // vm.$options._parentElm
+      // vm.$el.__vue__ = vm
+      // callHook(vm, 'mounted')
     }
   }
 }

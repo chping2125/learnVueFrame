@@ -53,6 +53,8 @@ export function lifecycleMixin (Vue: Class<Component>) {
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     if (vm._isMounted) {
+      // 如果已经加载，则触发数据更新，
+      // 因为该方法会在数据变化之后，触发虚拟 DOM 的 Watcher ，然后触发 _update
       callHook(vm, 'beforeUpdate')
     }
     const prevEl = vm.$el
@@ -64,6 +66,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // based on the rendering backend used.
     if (!prevVnode) {
       // initial render
+      // __patch__ 方法在 platform/index.js 中挂载
       vm.$el = vm.__patch__(
         vm.$el, vnode, hydrating, false /* removeOnly */,
         vm.$options._parentElm,
@@ -189,15 +192,23 @@ export function mountComponent (
     }
   } else {
     updateComponent = () => {
+      // 真正执行的地方
+      // _update 函数是在当前文件的 lifecycleMixin 方法中初始化的挂载的
+      // _render 函数是在 ./render.js 中的 renderMixin 方法中初始化挂载的
+      //
+      // 返回值是虚拟 DOM
       vm._update(vm._render(), hydrating)
     }
   }
 
+  // 将虚拟 DOM 放入 Watcher 中监听，当值变化时，重新更新虚拟 DOM
+  // 这就实现了重新渲染 DOM 的工作
   vm._watcher = new Watcher(vm, updateComponent, noop)
   hydrating = false
 
   // manually mounted instance, call mounted on self
   // mounted is called for render-created child components in its inserted hook
+  // 如果是第一次mount则触发 mounted 生命周期钩子
   if (vm.$vnode == null) {
     vm._isMounted = true
     callHook(vm, 'mounted')

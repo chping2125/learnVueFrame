@@ -72,9 +72,11 @@ export function renderMixin (Vue: Class<Component>) {
 
   Vue.prototype._render = function (): VNode {
     const vm: Component = this
+    // 从 vm.$options 对象中取出来的两个方法，一个对象
+    // render, staticRenderFns 两个方法
     const {
       render,
-      staticRenderFns,
+      staticRenderFns, // 在 entry-runtime-with-complier 中 $mount 中存到 $options 上的
       _parentVnode
     } = vm.$options
 
@@ -96,6 +98,9 @@ export function renderMixin (Vue: Class<Component>) {
     // render self
     let vnode
     try {
+      // render 函数是从 template 或 el 编译而来的，返回一个虚拟 DOM 对象
+      // _renderProxy 在 ./init.js 中挂载到 vm 上的，就是 当前的 vm
+      // $createElement 在 当前文件的 initRender 方法中挂载到 vm 上
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e) {
       handleError(e, vm, `render function`)
