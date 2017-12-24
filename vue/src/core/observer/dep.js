@@ -9,9 +9,9 @@ let uid = 0
  * A dep is an observable that can have multiple
  * directives subscribing to it.
  */
-
+// Dep 就是专门用来存储依赖的
 export default class Dep {
-  static target: ?Watcher;
+  static target: ?Watcher; // 静态变量
   id: number;
   subs: Array<Watcher>;
 
@@ -31,9 +31,10 @@ export default class Dep {
     remove(this.subs, sub)
   }
 
-  // 依赖收集，当存在Dep.target的时候添加观察者对象
+  // 依赖收集，当存在 Dep.target 的时候添加观察者对象
   depend () {
     if (Dep.target) {
+      // Dep.target Watcher 之后的但钱依赖
       Dep.target.addDep(this)
     }
   }
@@ -51,7 +52,7 @@ export default class Dep {
 // the current target watcher being evaluated.
 // this is globally unique because there could be only one
 // watcher being evaluated at any time.
-// 依赖收集完需要将Dep.target设为null，防止后面重复添加依赖
+// 依赖收集完需要将 Dep.target 设为 null，防止后面重复添加依赖
 Dep.target = null
 const targetStack = []
 

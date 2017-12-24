@@ -21,6 +21,7 @@ let uid = 0
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
  */
+// Watcher 是一个中介的角色，数据发生变化通知给 Watcher，然后 Watcher 在通知给其他地方
 export default class Watcher {
   vm: Component;
   expression: string;
@@ -46,6 +47,7 @@ export default class Watcher {
     options?: Object
   ) {
     this.vm = vm
+    // 记录当前依赖到 _watchers 中
     vm._watchers.push(this)
     // options
     if (options) {
@@ -82,6 +84,8 @@ export default class Watcher {
         )
       }
     }
+
+    // watcher 实例初始化的时候，调用自身的 get 方法（Watcher.prototype.get）收集依赖
     this.value = this.lazy
       ? undefined
       : this.get()
@@ -91,10 +95,14 @@ export default class Watcher {
    * Evaluate the getter, and re-collect dependencies.
    */
   get () {
+    // 1. 设置 Dep.target 为当前 watcher 实例
     pushTarget(this)
     let value
     const vm = this.vm
     try {
+      // 2. 调用属性的 getter 方法，因为第一步中已经设置全局的 Dep.target ，所以 getter 中会
+      // 触发 dep.depend 方法，然后 dep.depend 方法中触发当前实例上的 watcher.addDep 方法
+      // 添加 watcher (订阅者) 到该属性的 dep 中。
       value = this.getter.call(vm, vm)
     } catch (e) {
       if (this.user) {
@@ -108,6 +116,7 @@ export default class Watcher {
       if (this.deep) {
         traverse(value)
       }
+      // 3. 清空 Dep.target
       popTarget()
       this.cleanupDeps()
     }
@@ -123,7 +132,7 @@ export default class Watcher {
       this.newDepIds.add(id)
       this.newDeps.push(dep)
       if (!this.depIds.has(id)) {
-        dep.addSub(this)
+        dep.addSub(this) // 收集依赖，将 watcher 存到属性的 dep 中
       }
     }
   }
