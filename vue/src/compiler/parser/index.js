@@ -43,23 +43,26 @@ let platformGetTagNamespace
 /**
  * Convert HTML string to AST.
  */
+// 编译 HTML 为 AST
 export function parse (
   template: string,
   options: CompilerOptions
 ): ASTElement | void {
+  // 警告函数，baseWarn是Vue 编译器默认警告
   warn = options.warn || baseWarn
 
   platformIsPreTag = options.isPreTag || no
   platformMustUseProp = options.mustUseProp || no
   platformGetTagNamespace = options.getTagNamespace || no
 
+  //
   transforms = pluckModuleFunction(options.modules, 'transformNode')
   preTransforms = pluckModuleFunction(options.modules, 'preTransformNode')
   postTransforms = pluckModuleFunction(options.modules, 'postTransformNode')
 
   delimiters = options.delimiters
 
-  const stack = []
+  const stack = [] // 存放元素
   const preserveWhitespace = options.preserveWhitespace !== false
   let root
   let currentParent
@@ -91,6 +94,7 @@ export function parse (
     canBeLeftOpenTag: options.canBeLeftOpenTag,
     shouldDecodeNewlines: options.shouldDecodeNewlines,
     shouldKeepComment: options.comments,
+    // 处理开始标签里面的属性
     start (tag, attrs, unary) {
       // check namespace.
       // inherit parent ns if there is one
@@ -140,6 +144,7 @@ export function parse (
       if (inVPre) {
         processRawAttrs(element)
       } else {
+        // 处理 vue 自带属性
         processFor(element)
         processIf(element)
         processOnce(element)
@@ -180,6 +185,7 @@ export function parse (
         root = element
         checkRootConstraints(root)
       } else if (!stack.length) {
+        // 根节点检测
         // allow root elements with v-if, v-else-if and v-else
         if (root.if && (element.elseif || element.else)) {
           checkRootConstraints(element)
@@ -219,19 +225,25 @@ export function parse (
       }
     },
 
+    // 处理闭合标签，最后面的空格
     end () {
       // remove trailing whitespace
+      // 取出最后一个元素
       const element = stack[stack.length - 1]
+      // 取出最后一个元素的最后一个子节点
       const lastNode = element.children[element.children.length - 1]
+      // 该子节点是非 <pre> 标签的文本，实际上是</div> </div> 这种，删除中间的‘ ’
       if (lastNode && lastNode.type === 3 && lastNode.text === ' ' && !inPre) {
         element.children.pop()
       }
       // pop stack
+      // 出栈
       stack.length -= 1
       currentParent = stack[stack.length - 1]
       endPre(element)
     },
 
+    // 文本处理
     chars (text: string) {
       if (!currentParent) {
         if (process.env.NODE_ENV !== 'production') {
@@ -256,6 +268,12 @@ export function parse (
         return
       }
       const children = currentParent.children
+      // 如果文本不为空，判断父标签是不是script或style，
+      //    如果是则什么都不管，
+      //    如果不是需要 decode 一下编码，使用github上的 he 这个类库的 decodeHTML 方法
+      // 如果文本为空，判断有没有兄弟节点，也就是 parent.children.length 是不是为 0
+      //    如果大于0 返回 ' '
+      //    如果为 0 返回 ''
       text = inPre || text.trim()
         ? isTextTag(currentParent) ? text : decodeHTMLCached(text)
         // only preserve whitespace if its not right after a starting tag
@@ -276,6 +294,7 @@ export function parse (
         }
       }
     },
+    // 注释 AST 保存
     comment (text: string) {
       currentParent.children.push({
         type: 3,

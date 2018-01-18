@@ -49,18 +49,25 @@ export function generate (
   }
 }
 
+// 生成函数： ast  ->   render   和      staticRenderFns
 export function genElement (el: ASTElement, state: CodegenState): string {
   if (el.staticRoot && !el.staticProcessed) {
+    // 静态节点处理
     return genStatic(el, state)
   } else if (el.once && !el.onceProcessed) {
+    // 处理 v-once
     return genOnce(el, state)
   } else if (el.for && !el.forProcessed) {
+    // 处理 v-for
     return genFor(el, state)
   } else if (el.if && !el.ifProcessed) {
+    // 处理 v-if
     return genIf(el, state)
   } else if (el.tag === 'template' && !el.slotTarget) {
+    // 处理 template
     return genChildren(el, state) || 'void 0'
   } else if (el.tag === 'slot') {
+    // 处理 slot
     return genSlot(el, state)
   } else {
     // component or element
@@ -87,7 +94,7 @@ export function genElement (el: ASTElement, state: CodegenState): string {
 
 // hoist static sub-trees out
 function genStatic (el: ASTElement, state: CodegenState): string {
-  el.staticProcessed = true
+  el.staticProcessed = true // 已处理过的标记
   state.staticRenderFns.push(`with(this){return ${genElement(el, state)}}`)
   return `_m(${state.staticRenderFns.length - 1}${el.staticInFor ? ',true' : ''})`
 }

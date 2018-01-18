@@ -12,6 +12,7 @@ const buildRegex = cached(delimiters => {
   return new RegExp(open + '((?:.|\\n)+?)' + close, 'g')
 })
 
+// 文本内容编译 _s
 export function parseText (
   text: string,
   delimiters?: [string, string]

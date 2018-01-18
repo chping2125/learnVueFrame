@@ -64,9 +64,9 @@ export function lifecycleMixin (Vue: Class<Component>) {
     vm._vnode = vnode
     // Vue.prototype.__patch__ is injected in entry points
     // based on the rendering backend used.
-    if (!prevVnode) {
+    if (!prevVnode) { // 基于后端渲染Vue.prototype.__patch__被用来作为一个入口
       // initial render
-      // __patch__ 方法在 platform/index.js 中挂载
+      // __patch__ 方法在 platform/web/runtime/index.js 中挂载
       vm.$el = vm.__patch__(
         vm.$el, vnode, hydrating, false /* removeOnly */,
         vm.$options._parentElm,
@@ -75,7 +75,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
       // no need for the ref nodes after initial patch
       // this prevents keeping a detached DOM tree in memory (#5851)
       vm.$options._parentElm = vm.$options._refElm = null
-    } else {
+    } else { // 更行渲染
       // updates
       vm.$el = vm.__patch__(prevVnode, vnode)
     }

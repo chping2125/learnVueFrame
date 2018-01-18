@@ -12,6 +12,7 @@ import directives from './directives/index'
 import { genStaticKeys } from 'shared/util'
 import { isUnaryTag, canBeLeftOpenTag } from './util'
 
+// 编译基础配置
 export const baseOptions: CompilerOptions = {
   expectHTML: true,
   modules,

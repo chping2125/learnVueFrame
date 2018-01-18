@@ -17,6 +17,8 @@ function createFunction (code, errors) {
   }
 }
 
+
+//
 export function createCompileToFunctionFn (compile: Function): Function {
   const cache: {
     [key: string]: CompiledFunctionResult;

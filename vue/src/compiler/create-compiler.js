@@ -17,7 +17,7 @@ export function createCompilerCreator (baseCompile: Function): Function {
         (tip ? tips : errors).push(msg)
       }
 
-      if (options) {
+      if (options) {// 合并策略
         // merge custom modules
         if (options.modules) {
           finalOptions.modules =
