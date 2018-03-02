@@ -12,7 +12,7 @@ export function initUse (Vue: GlobalAPI) {
 
     // 附加参数，类数组转为数组
     const args = toArray(arguments, 1)
-    // 执行组件的 install 方法，注册组件
+    // 将 install 方法的第一个参数设置为 Vue
     args.unshift(this)
     if (typeof plugin.install === 'function') {
       plugin.install.apply(plugin, args)
